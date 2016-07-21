@@ -16,154 +16,158 @@ import java.util.Map;
  * <code>AppointmentBook</code>.  However, in its current state, it is an example
  * of how to use HTTP and Java servlets to store simple key/value pairs.
  */
-public class AppointmentBookServlet extends HttpServlet
-{
-    private final Map<String, String> data = new HashMap<>();
+public class AppointmentBookServlet extends HttpServlet {
+  private final Map<String, AppointmentBook> appointmentBooks = new HashMap<>();
 
-    /**
-     * Handles an HTTP GET request from a client by writing the value of the key
-     * specified in the "key" HTTP parameter to the HTTP response.  If the "key"
-     * parameter is not specified, all of the key/value pairs are written to the
-     * HTTP response.
-     */
-    @Override
-    protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
-    {
-        response.setContentType( "text/plain" );
+  /**
+   * Handles an HTTP GET request from a client by writing the value of the key
+   * specified in the "key" HTTP parameter to the HTTP response.  If the "key"
+   * parameter is not specified, all of the key/value pairs are written to the
+   * HTTP response.
+   */
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setContentType("text/plain");
 
-        String owner = getParameter( "owner", request );
-        if (owner != null) {
-            writeValue(owner, response);
+    String owner = getParameter("owner", request);
+    AppointmentBook book = getAppointmentBook(owner);
+    prettyPrint(book);
+    if (owner != null) {
+      writeValue(owner, response);
 
-        } else {
-            writeAllMappings(response);
-        }
+    } else {
+      writeAllMappings(response);
+    }
+  }
+
+  private void prettyPrint(AppointmentBook book) {
+    
+  }
+
+  private AppointmentBook getAppointmentBook(String owner) {
+    return this.appointmentBooks.get(owner);
+  }
+
+  /**
+   * Handles an HTTP POST request by storing the key/value pair specified by the
+   * "key" and "value" request parameters.  It writes the key/value pair to the
+   * HTTP response.
+   */
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setContentType("text/plain");
+
+    String key = getParameter("key", request);
+    if (key == null) {
+      missingRequiredParameter(response, "key");
+      return;
     }
 
-    /**
-     * Handles an HTTP POST request by storing the key/value pair specified by the
-     * "key" and "value" request parameters.  It writes the key/value pair to the
-     * HTTP response.
-     */
-    @Override
-    protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
-    {
-        response.setContentType( "text/plain" );
-
-        String key = getParameter( "key", request );
-        if (key == null) {
-            missingRequiredParameter(response, "key");
-            return;
-        }
-
-        String value = getParameter( "value", request );
-        if ( value == null) {
-            missingRequiredParameter( response, "value" );
-            return;
-        }
-
-        this.data.put(key, value);
-
-        PrintWriter pw = response.getWriter();
-        pw.println(Messages.mappedKeyValue(key, value));
-        pw.flush();
-
-        response.setStatus( HttpServletResponse.SC_OK);
+    String value = getParameter("value", request);
+    if (value == null) {
+      missingRequiredParameter(response, "value");
+      return;
     }
 
-    /**
-     * Handles an HTTP DELETE request by removing all key/value pairs.  This
-     * behavior is exposed for testing purposes only.  It's probably not
-     * something that you'd want a real application to expose.
-     */
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/plain");
+    this.appointmentBooks.put(key, value);
 
-        this.data.clear();
+    PrintWriter pw = response.getWriter();
+    pw.println(Messages.mappedKeyValue(key, value));
+    pw.flush();
 
-        PrintWriter pw = response.getWriter();
-        pw.println(Messages.allMappingsDeleted());
-        pw.flush();
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
 
-        response.setStatus(HttpServletResponse.SC_OK);
+  /**
+   * Handles an HTTP DELETE request by removing all key/value pairs.  This
+   * behavior is exposed for testing purposes only.  It's probably not
+   * something that you'd want a real application to expose.
+   */
+  @Override
+  protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setContentType("text/plain");
 
+    this.appointmentBooks.clear();
+
+    PrintWriter pw = response.getWriter();
+    pw.println(Messages.allMappingsDeleted());
+    pw.flush();
+
+    response.setStatus(HttpServletResponse.SC_OK);
+
+  }
+
+  /**
+   * Writes an error message about a missing parameter to the HTTP response.
+   * <p>
+   * The text of the error message is created by {@link Messages#missingRequiredParameter(String)}
+   */
+  private void missingRequiredParameter(HttpServletResponse response, String parameterName)
+          throws IOException {
+    String message = Messages.missingRequiredParameter(parameterName);
+    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, message);
+  }
+
+  /**
+   * Writes the value of the given key to the HTTP response.
+   * <p>
+   * The text of the message is formatted with {@link Messages#getMappingCount(int)}
+   * and {@link Messages#formatKeyValuePair(String, String)}
+   */
+  private void writeValue(String key, HttpServletResponse response) throws IOException {
+    String value = this.appointmentBooks.get(key);
+
+    PrintWriter pw = response.getWriter();
+    pw.println(Messages.getMappingCount(value != null ? 1 : 0));
+    pw.println(Messages.formatKeyValuePair(key, value));
+
+    pw.flush();
+
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
+
+  /**
+   * Writes all of the key/value pairs to the HTTP response.
+   * <p>
+   * The text of the message is formatted with
+   * {@link Messages#formatKeyValuePair(String, String)}
+   */
+  private void writeAllMappings(HttpServletResponse response) throws IOException {
+    PrintWriter pw = response.getWriter();
+    pw.println(Messages.getMappingCount(appointmentBooks.size()));
+
+    for (Map.Entry<String, String> entry : this.appointmentBooks.entrySet()) {
+      pw.println(Messages.formatKeyValuePair(entry.getKey(), entry.getValue()));
     }
 
-    /**
-     * Writes an error message about a missing parameter to the HTTP response.
-     *
-     * The text of the error message is created by {@link Messages#missingRequiredParameter(String)}
-     */
-    private void missingRequiredParameter( HttpServletResponse response, String parameterName )
-        throws IOException
-    {
-        String message = Messages.missingRequiredParameter(parameterName);
-        response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, message);
+    pw.flush();
+
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
+
+  /**
+   * Returns the value of the HTTP request parameter with the given name.
+   *
+   * @return <code>null</code> if the value of the parameter is
+   * <code>null</code> or is the empty string
+   */
+  private String getParameter(String name, HttpServletRequest request) {
+    String value = request.getParameter(name);
+    if (value == null || "".equals(value)) {
+      return null;
+
+    } else {
+      return value;
     }
+  }
 
-    /**
-     * Writes the value of the given key to the HTTP response.
-     *
-     * The text of the message is formatted with {@link Messages#getMappingCount(int)}
-     * and {@link Messages#formatKeyValuePair(String, String)}
-     */
-    private void writeValue( String key, HttpServletResponse response ) throws IOException
-    {
-        String value = this.data.get(key);
+  @VisibleForTesting
+  void setValueForKey(String key, String value) {
+    this.appointmentBooks.put(key, value);
+  }
 
-        PrintWriter pw = response.getWriter();
-        pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
-        pw.println(Messages.formatKeyValuePair(key, value));
-
-        pw.flush();
-
-        response.setStatus( HttpServletResponse.SC_OK );
-    }
-
-    /**
-     * Writes all of the key/value pairs to the HTTP response.
-     *
-     * The text of the message is formatted with
-     * {@link Messages#formatKeyValuePair(String, String)}
-     */
-    private void writeAllMappings( HttpServletResponse response ) throws IOException
-    {
-        PrintWriter pw = response.getWriter();
-        pw.println(Messages.getMappingCount(data.size()));
-
-        for (Map.Entry<String, String> entry : this.data.entrySet()) {
-            pw.println(Messages.formatKeyValuePair(entry.getKey(), entry.getValue()));
-        }
-
-        pw.flush();
-
-        response.setStatus( HttpServletResponse.SC_OK );
-    }
-
-    /**
-     * Returns the value of the HTTP request parameter with the given name.
-     *
-     * @return <code>null</code> if the value of the parameter is
-     *         <code>null</code> or is the empty string
-     */
-    private String getParameter(String name, HttpServletRequest request) {
-      String value = request.getParameter(name);
-      if (value == null || "".equals(value)) {
-        return null;
-
-      } else {
-        return value;
-      }
-    }
-
-    @VisibleForTesting
-    void setValueForKey(String key, String value) {
-        this.data.put(key, value);
-    }
-
-    @VisibleForTesting
-    String getValueForKey(String key) {
-        return this.data.get(key);
-    }
+  @VisibleForTesting
+  String getValueForKey(String key) {
+    return this.appointmentBooks.get(key);
+  }
 }
