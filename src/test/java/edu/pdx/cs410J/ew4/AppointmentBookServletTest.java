@@ -20,6 +20,12 @@ import static org.mockito.Mockito.*;
  */
 public class AppointmentBookServletTest {
 
+  /**
+   * Do get pretty prints appointment book.
+   *
+   * @throws ServletException the servlet exception
+   * @throws IOException      the io exception
+   */
   @Test
   public void doGetPrettyPrintsAppointmentBook() throws ServletException, IOException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();
@@ -27,19 +33,23 @@ public class AppointmentBookServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     PrintWriter pw = mock(PrintWriter.class);
-//    BufferedWriter bw = mock(BufferedWriter.class);
 
-    String ownerName = "Test Owner";
+    String ownerName = "TestOwner";
     when(request.getParameter("owner")).thenReturn(ownerName);
     when(response.getWriter()).thenReturn(pw);
 
     servlet.doGet(request, response);
 
-//    int expectedMappings = 0;
     verify(pw).println(/*"Owner: " +*/ ownerName);
     verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
+  /**
+   * Post to servlet creates appointment.
+   *
+   * @throws ServletException the servlet exception
+   * @throws IOException      the io exception
+   */
   @Test
   public void postToServletCreatesAppointment() throws ServletException, IOException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();
@@ -48,7 +58,7 @@ public class AppointmentBookServletTest {
     HttpServletResponse response = mock(HttpServletResponse.class);
     PrintWriter pw = mock(PrintWriter.class);
 
-    String ownerName = "Test Owner";
+    String ownerName = "TestOwner";
     when(request.getParameter("owner")).thenReturn(ownerName);
     String description = "My test description";
     when(request.getParameter("description")).thenReturn(description);
@@ -61,7 +71,6 @@ public class AppointmentBookServletTest {
 
     servlet.doPost(request, response);
 
-//    int expectedMappings = 0;
     verify(response).setStatus(HttpServletResponse.SC_OK);
 
     AppointmentBook book = servlet.getAppointmentBook(ownerName);
@@ -91,26 +100,4 @@ public class AppointmentBookServletTest {
     verify(response).setStatus(HttpServletResponse.SC_OK);
   }*/
 
-  @Test
-  public void addOneMapping() throws ServletException, IOException {
-    AppointmentBookServlet servlet = new AppointmentBookServlet();
-
-    String testKey = "TEST KEY";
-    String testValue = "TEST VALUE";
-
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.getParameter("key")).thenReturn(testKey);
-    when(request.getParameter("value")).thenReturn(testValue);
-
-    HttpServletResponse response = mock(HttpServletResponse.class);
-    PrintWriter pw = mock(PrintWriter.class);
-
-    when(response.getWriter()).thenReturn(pw);
-
-    servlet.doPost(request, response);
-    verify(pw).println(Messages.mappedKeyValue(testKey, testValue));
-    verify(response).setStatus(HttpServletResponse.SC_OK);
-
-    assertThat(servlet.getValueForKey(testKey), equalTo(testValue));
-  }
 }

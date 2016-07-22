@@ -3,10 +3,8 @@ package edu.pdx.cs410J.ew4;
 import edu.pdx.cs410J.AbstractAppointment;
 import edu.pdx.cs410J.AbstractAppointmentBook;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -21,8 +19,9 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
   /**
    * Instantiates a new Appointment book.
    */
-  public AppointmentBook() {
-    this.appointments = new ArrayList<>();
+  public AppointmentBook(AppointmentBook that) {
+    this.ownerName = that.getOwnerName();
+    this.appointments = that.getAppointments();
   }
 
   /**
@@ -41,10 +40,15 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
    * @return the sorted set
    */
   public SortedSet<Appointment> getSortedSet() {
-    SortedSet<Appointment> sortedAppointments = new TreeSet<>(Appointment::compareTo);
+    SortedSet<Appointment> sortedAppointments = new TreeSet<>(new Comparator<Appointment>() {
+      @Override
+      public int compare(Appointment appointment, Appointment that) {
+        return appointment.compareTo(that);
+      }
+    });
     for (Object fromCollection : this.appointments) {
-      Appointment toSorted = (Appointment) fromCollection;
-      sortedAppointments.add(toSorted);
+      AtomicReference<Appointment> toSorted = new AtomicReference<>((Appointment) fromCollection);
+      sortedAppointments.add(toSorted.get());
     }
     return sortedAppointments;
   }

@@ -7,6 +7,7 @@ import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -26,9 +27,34 @@ public class AppointmentBookRestClientIT {
   @Test
   public void invokingGETWithJustOwnerNamePrettyPrinterOwnerParameter() throws IOException {
     AppointmentBookRestClient client = newAppointmentBookRestClient();
-    String owner = "Test Owner";
+    String owner = "TestOwner";
     Response response = client.prettyPrintAppointmentBook(owner);
     assertThat(response.getContent(), response.getCode(), equalTo(200));
+    assertThat(response.getContent(), containsString(owner));
+  }
+
+  @Test
+  public void invokingPOSTCreatesAnAppointmentBookAndAppointment() throws IOException {
+    AppointmentBookRestClient client = newAppointmentBookRestClient();
+    String owner = "TestOwner";
+    String description = "My test description";
+    String beginTime = "1/2/2016 1:00 PM";
+    String endTime = "1/4/2016 2:00 PM";
+
+    Response response = client.createAppointment(owner, description, endTime, beginTime);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    response = client.prettyPrintAppointmentBook(owner);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    String prettyBeginTime = "Saturday, January 2, 2016 1:00:00 PM PST";
+    String prettyEndTime = "Monday, January 4, 2016 2:00:00 PM PST";
+
+    assertThat(response.getContent(), containsString(owner));
+    assertThat(response.getContent(), containsString(description));
+    assertThat(response.getContent(), containsString(prettyBeginTime));
+    assertThat(response.getContent(), containsString(prettyEndTime));
+
   }
 
 //  @Test

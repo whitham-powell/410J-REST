@@ -79,9 +79,13 @@ public class PrettyPrinter implements AppointmentBookDumper {
   public void dump(AbstractAppointmentBook book) throws IOException {
     StringBuffer sb = new StringBuffer();
 //    sb.append("Owner: ").append(book.getOwnerName()).append("\n");
-
+//if(book == null){
+//  pw.println("BOOK WAS NULL?!??");
+//return;
+//}
     SortedSet<Appointment> sortedBook = ((AppointmentBook) book).getSortedSet();
     Iterator<Appointment> sortedAppointments = sortedBook.iterator();
+//  Iterator sortedAppointments = book.getAppointments().iterator();
 
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.LONG);
 
@@ -108,7 +112,7 @@ public class PrettyPrinter implements AppointmentBookDumper {
     pw.println(book.getOwnerName());
     pw.println(sb.toString());
     pw.flush();
-    pw.close();
+//    pw.close();
   }
 
 

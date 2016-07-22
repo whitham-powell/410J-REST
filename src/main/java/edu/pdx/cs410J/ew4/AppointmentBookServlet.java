@@ -8,8 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This servlet ultimately provides a REST API for working with an
@@ -17,14 +16,15 @@ import java.util.Map;
  * of how to use HTTP and Java servlets to store simple key/value pairs.
  */
 public class AppointmentBookServlet extends HttpServlet {
-  private final Map<String, AppointmentBook> appointmentBooks = new HashMap<>();
+  //  private final Map<String, AppointmentBook> appointmentBooks = Collections.synchronizedMap(new HashMap<>());
+  private ConcurrentHashMap<String, AppointmentBook> appointmentBooks = new ConcurrentHashMap<>();
 
   public AppointmentBookServlet() {
     createTestAppointmentBook();
   }
 
   private void createTestAppointmentBook() {
-    String ownerName = "Test Owner";
+    String ownerName = "TestOwner";
     AppointmentBook book = new AppointmentBook(ownerName);
     this.appointmentBooks.put(ownerName, book);
   }
@@ -38,19 +38,10 @@ public class AppointmentBookServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     response.setContentType("text/plain");
-
     String owner = getParameter("owner", request);
     AppointmentBook book = getAppointmentBook(owner);
     prettyPrint(book, response.getWriter());
-
     response.setStatus(HttpServletResponse.SC_OK);
-
-//    if (owner != null) {
-//      writeValue(owner, response);
-//
-//    } else {
-//      writeAllMappings(response);
-//    }
   }
 
   private void prettyPrint(AppointmentBook book, PrintWriter pw) throws IOException {
@@ -60,7 +51,7 @@ public class AppointmentBookServlet extends HttpServlet {
 
   @VisibleForTesting
   AppointmentBook getAppointmentBook(String owner) {
-    return this.appointmentBooks.get(owner);
+  return this.appointmentBooks.getOrDefault(owner, new AppointmentBook("owner not found"));
   }
 
   /**
@@ -79,32 +70,9 @@ public class AppointmentBookServlet extends HttpServlet {
     String description = getParameter("description", request);
     String beginTime = getParameter("beginTime", request);
     String endTime = getParameter("endTime", request);
-
-    book.addAppointment(new Appointment(description,beginTime,endTime));
-
-    response.setStatus(HttpServletResponse.SC_OK);
-
-    //    response.setContentType("text/plain");
-//
-//    String key = getParameter("key", request);
-//    if (key == null) {
-//      missingRequiredParameter(response, "key");
-//      return;
-//    }
-//
-//    String value = getParameter("value", request);
-//    if (value == null) {
-//      missingRequiredParameter(response, "value");
-//      return;
-//    }
-//
-//    this.appointmentBooks.put(key, value);
-//
-//    PrintWriter pw = response.getWriter();
-//    pw.println(Messages.mappedKeyValue(key, value));
-//    pw.flush();
-//
-//    response.setStatus(HttpServletResponse.SC_OK);
+      book.addAppointment(new Appointment(description, beginTime, endTime));
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.getWriter().println("null book in do post");
   }
 
   /**
@@ -114,15 +82,6 @@ public class AppointmentBookServlet extends HttpServlet {
    */
   @Override
   protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    response.setContentType("text/plain");
-
-    this.appointmentBooks.clear();
-
-    PrintWriter pw = response.getWriter();
-    pw.println(Messages.allMappingsDeleted());
-    pw.flush();
-
-    response.setStatus(HttpServletResponse.SC_OK);
 
   }
 
@@ -135,24 +94,6 @@ public class AppointmentBookServlet extends HttpServlet {
           throws IOException {
     String message = Messages.missingRequiredParameter(parameterName);
     response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, message);
-  }
-
-  /**
-   * Writes the value of the given key to the HTTP response.
-   * <p>
-   * The text of the message is formatted with {@link Messages#getMappingCount(int)}
-   * and {@link Messages#formatKeyValuePair(String, String)}
-   */
-  private void writeValue(String key, HttpServletResponse response) throws IOException {
-//    String value = this.appointmentBooks.get(key);
-
-//    PrintWriter pw = response.getWriter();
-//    pw.println(Messages.getMappingCount(value != null ? 1 : 0));
-//    pw.println(Messages.formatKeyValuePair(key, value));
-
-//    pw.flush();
-
-//    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   /**
@@ -191,13 +132,8 @@ public class AppointmentBookServlet extends HttpServlet {
   }
 
   @VisibleForTesting
-  void setValueForKey(String key, String value) {
-//    this.appointmentBooks.put(key, value);
-  }
-
-  @VisibleForTesting
   String getValueForKey(String key) {
 //    return this.appointmentBooks.get(key);
-    throw new UnsupportedOperationException("I don't work yet");
+    throw new UnsupportedOperationException("I don't work yet anymore!");
   }
 }
