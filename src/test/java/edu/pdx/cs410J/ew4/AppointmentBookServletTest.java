@@ -27,7 +27,7 @@ public class AppointmentBookServletTest {
     PrintWriter pw = mock(PrintWriter.class);
 //    BufferedWriter bw = mock(BufferedWriter.class);
 
-    String ownerName = "TestOwner";
+    String ownerName = "Test Owner";
     when(request.getParameter("owner")).thenReturn(ownerName);
     when(response.getWriter()).thenReturn(pw);
 

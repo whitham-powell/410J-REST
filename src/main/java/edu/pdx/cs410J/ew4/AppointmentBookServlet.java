@@ -24,7 +24,7 @@ public class AppointmentBookServlet extends HttpServlet {
   }
 
   private void createTestAppointmentBook() {
-    String ownerName = "TestOwner";
+    String ownerName = "Test Owner";
     AppointmentBook book = new AppointmentBook(ownerName);
     this.appointmentBooks.put(ownerName, book);
   }

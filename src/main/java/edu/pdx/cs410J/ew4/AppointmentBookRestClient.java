@@ -55,4 +55,10 @@ public class AppointmentBookRestClient extends HttpRequestHelper
     public Response removeAllMappings() throws IOException {
         return delete(this.url);
     }
+
+    public Response prettyPrintAppointmentBook(String owner) throws IOException {
+//        throw new UnsupportedOperationException("not implemented yet");
+    return get(this.url , "owner", owner);
+    }
+
 }
