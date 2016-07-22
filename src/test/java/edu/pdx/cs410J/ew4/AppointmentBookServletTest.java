@@ -25,6 +25,7 @@ public class AppointmentBookServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     PrintWriter pw = mock(PrintWriter.class);
+//    BufferedWriter bw = mock(BufferedWriter.class);
 
     String ownerName = "TestOwner";
     when(request.getParameter("owner")).thenReturn(ownerName);
@@ -33,7 +34,7 @@ public class AppointmentBookServletTest {
     servlet.doGet(request, response);
 
 //    int expectedMappings = 0;
-    verify(pw).println(ownerName);
+    verify(pw).println(/*"Owner: " +*/ ownerName);
     verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 

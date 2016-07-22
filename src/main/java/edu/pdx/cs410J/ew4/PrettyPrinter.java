@@ -17,6 +17,7 @@ import java.util.SortedSet;
  */
 public class PrettyPrinter implements AppointmentBookDumper {
   private BufferedWriter bw;
+  private PrintWriter pw;
 
   /**
    * Instantiates a new Pretty printer.for writing to Standard Out.
@@ -63,6 +64,10 @@ public class PrettyPrinter implements AppointmentBookDumper {
     this.bw = bufferedWriter;
   }
 
+  public PrettyPrinter(PrintWriter printWriter) {
+    this.pw = printWriter;
+  }
+
 
   /**
    * Dumps an appointment book to some destination.
@@ -73,7 +78,7 @@ public class PrettyPrinter implements AppointmentBookDumper {
   @Override
   public void dump(AbstractAppointmentBook book) throws IOException {
     StringBuffer sb = new StringBuffer();
-    sb.append("Owner: ").append(book.getOwnerName()).append("\n");
+//    sb.append("Owner: ").append(book.getOwnerName()).append("\n");
 
     SortedSet<Appointment> sortedBook = ((AppointmentBook) book).getSortedSet();
     Iterator<Appointment> sortedAppointments = sortedBook.iterator();
@@ -98,8 +103,12 @@ public class PrettyPrinter implements AppointmentBookDumper {
         sb.append("Duration: ").append(hours).append(" hours, ").append((int) minutes % 60).append(" minutes\n");
       }
     }
-    bw.write(sb.toString());
-    bw.close();
+//    bw.write(sb.toString());
+//    bw.close();
+    pw.println(book.getOwnerName());
+    pw.println(sb.toString());
+    pw.flush();
+    pw.close();
   }
 
 
