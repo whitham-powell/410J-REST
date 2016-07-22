@@ -63,11 +63,11 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
    */
   @Override
   public Collection<AbstractAppointment> getAppointments() {
-    if (appointments.isEmpty()) {
-      return null;
-    } else {
+//    if (appointments.isEmpty()) {
+//      return null;
+//    } else {
       return this.appointments;
-    }
+//    }
   }
 
   /**

@@ -58,7 +58,8 @@ public class AppointmentBookServlet extends HttpServlet {
     pp.dump(book);
   }
 
-  private AppointmentBook getAppointmentBook(String owner) {
+  @VisibleForTesting
+  AppointmentBook getAppointmentBook(String owner) {
     return this.appointmentBooks.get(owner);
   }
 
@@ -69,7 +70,21 @@ public class AppointmentBookServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//    response.setContentType("text/plain");
+
+    response.setContentType("text/plain");
+
+    String owner = getParameter("owner", request);
+    AppointmentBook book = getAppointmentBook(owner);
+
+    String description = getParameter("description", request);
+    String beginTime = getParameter("beginTime", request);
+    String endTime = getParameter("endTime", request);
+
+    book.addAppointment(new Appointment(description,beginTime,endTime));
+
+    response.setStatus(HttpServletResponse.SC_OK);
+
+    //    response.setContentType("text/plain");
 //
 //    String key = getParameter("key", request);
 //    if (key == null) {

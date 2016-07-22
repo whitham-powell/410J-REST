@@ -36,7 +36,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
     this.description = appointmentInfo[0];
 //    this.beginTimeString = appointmentInfo[1] + " " + appointmentInfo[2];
 //    this.endTimeString = appointmentInfo[3] + " " + appointmentInfo[4];
-    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+    DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm");
     try {
       Date date;
       date = df.parse(appointmentInfo[1] + " " + appointmentInfo[2]);
@@ -63,7 +63,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
    * @param endTimeString   The time and date the appointment ends as a <code>String</code>.
    */
   public Appointment(String description, String beginTimeString, String endTimeString) {
-    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+    DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
     try {
       Date date;
       date = df.parse(beginTimeString);
@@ -71,6 +71,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
       this.beginTimeString = df.format(this.beginTime);
     } catch (ParseException e) {
       this.beginTime = null;
+      this.beginTimeString = beginTimeString;
     }
     try {
       Date date;
@@ -79,6 +80,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
       this.endTimeString = df.format(this.endTime);
     } catch (ParseException e) {
       this.endTime = null;
+      this.endTimeString = endTimeString;
     }
     this.description = description;
   }
