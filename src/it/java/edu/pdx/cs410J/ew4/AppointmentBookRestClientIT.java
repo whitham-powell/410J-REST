@@ -25,7 +25,7 @@ public class AppointmentBookRestClientIT {
   }
 
   @Test
-  public void invokingGETWithJustOwnerNamePrettyPrinterOwnerParameter() throws IOException {
+  public void test0invokingGETWithJustOwnerNamePrettyPrinterOwnerParameter() throws IOException {
     AppointmentBookRestClient client = newAppointmentBookRestClient();
     String owner = "TestOwner";
     Response response = client.prettyPrintAppointmentBook(owner);
@@ -34,7 +34,7 @@ public class AppointmentBookRestClientIT {
   }
 
   @Test
-  public void invokingPOSTCreatesAnAppointmentBookAndAppointment() throws IOException {
+  public void test1invokingPOSTCreatesAnAppointmentBookAndAppointment() throws IOException {
     AppointmentBookRestClient client = newAppointmentBookRestClient();
     String owner = "TestOwner";
     String description = "My test description";

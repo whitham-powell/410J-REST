@@ -83,6 +83,27 @@ public class AppointmentBookServletTest {
 
   }
 
+  @Test
+  public void defaultActionIfNoParametersIsPrintListOfBookKeys() throws IOException, ServletException {
+    AppointmentBookServlet servlet = new AppointmentBookServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+    PrintWriter pw = mock(PrintWriter.class);
+
+    when(response.getWriter()).thenReturn(pw);
+    servlet.doGet(request, response);
+
+    int expectedMappings = 1;
+    verify(pw).println(Messages.getMappingCount(expectedMappings));
+    verify(response).setStatus(HttpServletResponse.SC_OK);
+  }
+
+  //TODO @Test public void ownerBookNotFoundPrintsListOfOwnerKeys()
+
+  //TODO @Test public void canPostMoreThanOneAppointmentToAnAppointmentBook()
+
+
   /*@Test
   public void initiallyServletContainsNoKeyValueMappings() throws ServletException, IOException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();

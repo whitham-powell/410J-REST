@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,9 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * of how to use HTTP and Java servlets to store simple key/value pairs.
  */
 public class AppointmentBookServlet extends HttpServlet {
-  //  private final Map<String, AppointmentBook> appointmentBooks = Collections.synchronizedMap(new HashMap<>());
   private ConcurrentHashMap<String, AppointmentBook> appointmentBooks = new ConcurrentHashMap<>();
 
+  /**
+   * Instantiates a new Appointment book servlet.
+   */
   public AppointmentBookServlet() {
     createTestAppointmentBook();
   }
@@ -38,20 +41,60 @@ public class AppointmentBookServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     response.setContentType("text/plain");
+
     String owner = getParameter("owner", request);
+
+    if(owner == null) {
+      listAllBookOwners(response);
+      return;
+    }
+
     AppointmentBook book = getAppointmentBook(owner);
+
+    if(book == null) {
+      bookNotFoundForOwner(response, owner);
+      return;
+    }
+
     prettyPrint(book, response.getWriter());
+
     response.setStatus(HttpServletResponse.SC_OK);
   }
 
+  /**
+   * Handles AppointmentBook for owner not found case.
+   *
+   * @param response <code>HttpServletResponse</code>
+   * @param owner of book attempted to be found.
+   * @throws IOException problem communicating with server.
+   */
+  private void bookNotFoundForOwner(HttpServletResponse response, String owner) throws IOException {
+    response.getWriter().println(Messages.noBookForOwner(owner));
+    response.setStatus(HttpServletResponse.SC_FOUND);
+  }
+
+  /**
+   * Conducts the pretty print for an AppointmentBook.
+   *
+   * @param book to be 'Pretty' printed.
+   * @param pw where to write the 'Pretty' printed book.
+   * @throws IOException problem communicating with server.
+   */
   private void prettyPrint(AppointmentBook book, PrintWriter pw) throws IOException {
     PrettyPrinter pp = new PrettyPrinter(pw);
     pp.dump(book);
+    pw.flush();
   }
 
+  /**
+   * Gets appointment book.
+   *
+   * @param owner the owner.
+   * @return the appointment book.
+   */
   @VisibleForTesting
   AppointmentBook getAppointmentBook(String owner) {
-  return this.appointmentBooks.getOrDefault(owner, new AppointmentBook("owner not found"));
+      return this.appointmentBooks.get(owner);
   }
 
   /**
@@ -70,9 +113,23 @@ public class AppointmentBookServlet extends HttpServlet {
     String description = getParameter("description", request);
     String beginTime = getParameter("beginTime", request);
     String endTime = getParameter("endTime", request);
-      book.addAppointment(new Appointment(description, beginTime, endTime));
-      response.setStatus(HttpServletResponse.SC_OK);
-      response.getWriter().println("null book in do post");
+
+    Appointment toAdd = new Appointment(description, beginTime, endTime);
+
+    book.addAppointment(toAdd);
+    putAppointmentBook(owner, book);
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
+
+  /**
+   * Adds an AppointmentBook to the HashMap of AppointmentBooks.
+   *
+   * @param owner Owner key.
+   * @param book to put.
+   * @return AppointmentBook replaced by put if copy found.
+   */
+  private AppointmentBook putAppointmentBook(String owner, AppointmentBook book) {
+    return this.appointmentBooks.put(owner, book);
   }
 
   /**
@@ -97,18 +154,18 @@ public class AppointmentBookServlet extends HttpServlet {
   }
 
   /**
-   * Writes all of the key/value pairs to the HTTP response.
+   * Writes all of the book owners to the HTTP response.
    * <p>
    * The text of the message is formatted with
-   * {@link Messages#formatKeyValuePair(String, String)}
+   * {@link Messages#formatOwnerListing(String)}
    */
-  private void writeAllMappings(HttpServletResponse response) throws IOException {
+  private void listAllBookOwners(HttpServletResponse response) throws IOException {
     PrintWriter pw = response.getWriter();
     pw.println(Messages.getMappingCount(appointmentBooks.size()));
 
-//    for (Map.Entry<String, String> entry : this.appointmentBooks.entrySet()) {
-//      pw.println(Messages.formatKeyValuePair(entry.getKey(), entry.getValue()));
-//    }
+    for (Map.Entry<String, AppointmentBook> entry : this.appointmentBooks.entrySet()){
+      pw.println(Messages.formatOwnerListing(entry.getKey()));
+    }
 
     pw.flush();
 
@@ -131,6 +188,12 @@ public class AppointmentBookServlet extends HttpServlet {
     }
   }
 
+  /**
+   * Gets value for key.
+   *
+   * @param key the key
+   * @return the value for key
+   */
   @VisibleForTesting
   String getValueForKey(String key) {
 //    return this.appointmentBooks.get(key);

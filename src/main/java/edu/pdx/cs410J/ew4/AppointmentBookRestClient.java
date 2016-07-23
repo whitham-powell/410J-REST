@@ -53,12 +53,10 @@ public class AppointmentBookRestClient extends HttpRequestHelper {
   }
 
   public Response prettyPrintAppointmentBook(String owner) throws IOException {
-//  throw new UnsupportedOperationException("not implemented yet");
     return get(this.url, "owner", owner);
   }
 
   public Response createAppointment(String owner, String description, String endTimeString, String beginTimeString) throws IOException {
-//  throw new UnsupportedOperationException("not implemented yet");
     return post(this.url, "owner", owner, "description", description, "beginTime", beginTimeString, "endTime", endTimeString);
   }
 

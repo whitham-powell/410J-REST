@@ -77,42 +77,36 @@ public class PrettyPrinter implements AppointmentBookDumper {
    */
   @Override
   public void dump(AbstractAppointmentBook book) throws IOException {
-    StringBuffer sb = new StringBuffer();
-//    sb.append("Owner: ").append(book.getOwnerName()).append("\n");
-//if(book == null){
-//  pw.println("BOOK WAS NULL?!??");
-//return;
-//}
     SortedSet<Appointment> sortedBook = ((AppointmentBook) book).getSortedSet();
     Iterator<Appointment> sortedAppointments = sortedBook.iterator();
-//  Iterator sortedAppointments = book.getAppointments().iterator();
 
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.LONG);
 
+    pw.println(book.getOwnerName());
+
     while (sortedAppointments.hasNext()) {
       Appointment appointment = sortedAppointments.next();
-      sb.append("=====================================================\n")
-              .append("Description:\n").append(appointment.getDescription()).append("\n");
 
       // Get the begin and end times
       Date beginTime = appointment.getBeginTime();
       Date endTime = appointment.getEndTime();
 
-      // If either is null duration is 0
+      // Get appointment duration
+      // If either Date is null duration is 0
+      long hours = 0;
+      long minutes = 0 ;
       if (beginTime != null && endTime != null) {
-        long hours = ChronoUnit.HOURS.between(beginTime.toInstant(), endTime.toInstant());
-        long minutes = ChronoUnit.MINUTES.between(beginTime.toInstant(), endTime.toInstant());
-        sb.append("From: ").append(df.format(beginTime)).append("\n")
-                .append("Until: ").append(df.format(endTime)).append("\n");
-        sb.append("Duration: ").append(hours).append(" hours, ").append((int) minutes % 60).append(" minutes\n");
+        hours = ChronoUnit.HOURS.between(beginTime.toInstant(), endTime.toInstant());
+        minutes = ChronoUnit.MINUTES.between(beginTime.toInstant(), endTime.toInstant());
       }
+
+      pw.println("=====================================================");
+      pw.format("Description: %s %n", appointment.getDescription());
+      pw.format("From: %s %n", df.format(beginTime));
+      pw.format("Until: %s %n", df.format(endTime));
+      pw.format("Duration: %d hours, %d minutes %n", hours, minutes % 60);
     }
-//    bw.write(sb.toString());
-//    bw.close();
-    pw.println(book.getOwnerName());
-    pw.println(sb.toString());
-    pw.flush();
-//    pw.close();
+
   }
 
 
