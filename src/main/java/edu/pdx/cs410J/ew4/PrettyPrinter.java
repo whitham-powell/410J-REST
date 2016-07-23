@@ -64,6 +64,11 @@ public class PrettyPrinter implements AppointmentBookDumper {
     this.bw = bufferedWriter;
   }
 
+  /**
+   * Instantiates a new Pretty printer.
+   *
+   * @param printWriter the print writer
+   */
   public PrettyPrinter(PrintWriter printWriter) {
     this.pw = printWriter;
   }
