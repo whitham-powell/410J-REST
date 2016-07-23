@@ -54,6 +54,51 @@ public class AppointmentBookRestClientIT {
     assertThat(response.getContent(), containsString(description));
     assertThat(response.getContent(), containsString(prettyBeginTime));
     assertThat(response.getContent(), containsString(prettyEndTime));
+  }
+
+  @Test
+  public void test2TwoMoreAppointmentsToTheBook() throws IOException {
+    AppointmentBookRestClient client = newAppointmentBookRestClient();
+    String owner = "TestOwner";
+
+    // app 1
+    String description1 = "Second test description";
+    String beginTime1 = "1/4/2016 5:00 PM";
+    String endTime1 = "1/4/2016 4:00 PM";
+
+    String prettyBeginTime1 = "Monday, January 4, 2016 5:00:00 PM PST";
+    String prettyEndTime1 = "Monday, January 4, 2016 4:00:00 PM PST";
+
+    Response response = client.createAppointment(owner, description1, beginTime1, endTime1);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    response = client.prettyPrintAppointmentBook(owner);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    assertThat("failed at app 1", response.getContent(), containsString(owner));
+    assertThat("failed at app 1", response.getContent(), containsString(description1));
+    assertThat("failed at app 1", response.getContent(), containsString(prettyBeginTime1));
+    assertThat("failed at app 1", response.getContent(), containsString(prettyEndTime1));
+
+    // app 2
+    String description2 = "Third test description";
+    String beginTime2 = "1/1/2016 4:00 AM";
+    String endTime2 = "1/1/2016 3:00 AM";
+
+    String prettyBeginTime2 = "Monday, January 4, 2016 5:00:00 PM PST";
+    String prettyEndTime2 = "Monday, January 4, 2016 4:00:00 PM PST";
+
+    response = client.createAppointment(owner, description2, beginTime2, endTime2);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    response = client.prettyPrintAppointmentBook(owner);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    assertThat("failed at app 2", response.getContent(), containsString(owner));
+    assertThat("failed at app 2", response.getContent(), containsString(description2));
+    assertThat("failed at app 2", response.getContent(), containsString(prettyBeginTime2));
+    assertThat("failed at app 2", response.getContent(), containsString(prettyEndTime2));
+
 
   }
 

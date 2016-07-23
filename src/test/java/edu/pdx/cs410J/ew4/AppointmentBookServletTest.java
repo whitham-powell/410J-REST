@@ -40,7 +40,7 @@ public class AppointmentBookServletTest {
 
     servlet.doGet(request, response);
 
-    verify(pw).println(/*"Owner: " +*/ ownerName);
+    verify(pw).println(ownerName);
     verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
@@ -101,8 +101,7 @@ public class AppointmentBookServletTest {
 
   //TODO @Test public void ownerBookNotFoundPrintsListOfOwnerKeys()
 
-  //TODO @Test public void canPostMoreThanOneAppointmentToAnAppointmentBook()
-
+  //TODO @Test public void doPostWithOwnerNotYetInDatabaseCreatesNewBookAndAddsAppointment()
 
   /*@Test
   public void initiallyServletContainsNoKeyValueMappings() throws ServletException, IOException {
