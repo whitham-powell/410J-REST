@@ -100,12 +100,13 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
     return appointments.size();
   }
 
+
   /**
-   * By range appointment book.
+   * By range sorted set.
    *
    * @param beginTimeRange the begin time range
    * @param endTimeRange   the end time range
-   * @return the appointment book
+   * @return the sorted set
    */
   public SortedSet<Appointment> byRange(Date beginTimeRange, Date endTimeRange) {
 
