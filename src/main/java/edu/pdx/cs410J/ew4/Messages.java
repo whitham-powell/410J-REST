@@ -32,4 +32,8 @@ public class Messages {
   public static String noBookForOwner(String owner) {
     return String.format("Book for owner: %s not found please post a new appointment book first.", owner);
   }
+
+  public static String dateTimeFailedToParse(String eMessage) {
+    return String.format("Bad date and/or time formatting: %n %s", eMessage);
+  }
 }

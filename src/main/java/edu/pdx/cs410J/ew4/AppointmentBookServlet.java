@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,10 +27,13 @@ public class AppointmentBookServlet extends HttpServlet {
    * Instantiates a new Appointment book servlet.
    */
   public AppointmentBookServlet() {
-    createTestAppointmentBook();
   }
 
-  private void createTestAppointmentBook() {
+  /**
+   * Create test appointment book.
+   */
+  @VisibleForTesting
+  void createTestAppointmentBook() {
     String ownerName = "TestOwner";
     AppointmentBook book = new AppointmentBook(ownerName);
     this.appointmentBooks.put(ownerName, book);
@@ -42,42 +49,88 @@ public class AppointmentBookServlet extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     response.setContentType("text/plain");
 
+    AppointmentBook book;
     String owner = getParameter("owner", request);
+    String beginTime = getParameter("beginTime", request);
+    String endTime = getParameter("endTime", request);
 
-    if(owner == null) {
+    if (owner == null) {
       listAllBookOwners(response);
       return;
     }
 
-    AppointmentBook book = getAppointmentBook(owner);
+    boolean byRange = false;
+    Date beginDateRange = null;
+    Date endDateRange = null;
 
-    if(book == null) {
-      bookNotFoundForOwner(response, owner);
+    if (beginTime != null && endTime != null) {
+      try {
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+        beginDateRange = df.parse(beginTime);
+        endDateRange = df.parse(endTime);
+      } catch (ParseException e) {
+        invalidDateTime(response, e.getMessage());
+        return;
+      }
+      byRange = true;
+    }
+
+    if (beginTime == null && endTime != null) {
+      missingRequiredParameter(response, "beginTime");
       return;
     }
 
-    prettyPrint(book, response.getWriter());
+    if (beginTime != null && endTime == null) {
+      missingRequiredParameter(response, "endTime");
+      return;
+    }
 
-    response.setStatus(HttpServletResponse.SC_OK);
+    book = getAppointmentBook(owner);
+
+    if (book == null) {
+      bookNotFoundForOwner(response, owner);
+      listAllBookOwners(response);
+      return;
+    }
+
+    if (byRange) {
+      prettyPrintRange(book, response.getWriter(), beginDateRange, endDateRange);
+      response.setStatus(HttpServletResponse.SC_OK);
+    } else {
+      prettyPrint(book, response.getWriter());
+      response.setStatus(HttpServletResponse.SC_OK);
+    }
+  }
+
+  private void prettyPrintRange(AppointmentBook book, PrintWriter pw, Date beginDateRange, Date endDateRange) throws IOException {
+    PrettyPrinter pp = new PrettyPrinter(pw);
+    pp.dumpRange(book, beginDateRange, endDateRange);
+    pw.flush();
+  }
+
+  //TODO document invalidDateTime
+  private void invalidDateTime(HttpServletResponse response, String eMessage) throws IOException {
+    String message = Messages.dateTimeFailedToParse(eMessage);
+    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, message);
   }
 
   /**
    * Handles AppointmentBook for owner not found case.
    *
    * @param response <code>HttpServletResponse</code>
-   * @param owner of book attempted to be found.
+   * @param owner    of book attempted to be found.
    * @throws IOException problem communicating with server.
    */
   private void bookNotFoundForOwner(HttpServletResponse response, String owner) throws IOException {
     response.getWriter().println(Messages.noBookForOwner(owner));
-    response.setStatus(HttpServletResponse.SC_FOUND);
+    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
   }
 
   /**
    * Conducts the pretty print for an AppointmentBook.
    *
    * @param book to be 'Pretty' printed.
-   * @param pw where to write the 'Pretty' printed book.
+   * @param pw   where to write the 'Pretty' printed book.
    * @throws IOException problem communicating with server.
    */
   private void prettyPrint(AppointmentBook book, PrintWriter pw) throws IOException {
@@ -94,7 +147,7 @@ public class AppointmentBookServlet extends HttpServlet {
    */
   @VisibleForTesting
   AppointmentBook getAppointmentBook(String owner) {
-      return this.appointmentBooks.get(owner);
+    return this.appointmentBooks.get(owner);
   }
 
   /**
@@ -116,6 +169,10 @@ public class AppointmentBookServlet extends HttpServlet {
 
     Appointment toAdd = new Appointment(description, beginTime, endTime);
 
+    if (book == null) {
+      book = new AppointmentBook(owner);
+    }
+
     book.addAppointment(toAdd);
     putAppointmentBook(owner, book);
     response.setStatus(HttpServletResponse.SC_OK);
@@ -125,7 +182,7 @@ public class AppointmentBookServlet extends HttpServlet {
    * Adds an AppointmentBook to the HashMap of AppointmentBooks.
    *
    * @param owner Owner key.
-   * @param book to put.
+   * @param book  to put.
    * @return AppointmentBook replaced by put if copy found.
    */
   private AppointmentBook putAppointmentBook(String owner, AppointmentBook book) {
@@ -163,7 +220,7 @@ public class AppointmentBookServlet extends HttpServlet {
     PrintWriter pw = response.getWriter();
     pw.println(Messages.getMappingCount(appointmentBooks.size()));
 
-    for (Map.Entry<String, AppointmentBook> entry : this.appointmentBooks.entrySet()){
+    for (Map.Entry<String, AppointmentBook> entry : this.appointmentBooks.entrySet()) {
       pw.println(Messages.formatOwnerListing(entry.getKey()));
     }
 
@@ -189,14 +246,15 @@ public class AppointmentBookServlet extends HttpServlet {
   }
 
   /**
-   * Gets value for key.
-   *
-   * @param key the key
-   * @return the value for key
+   * Create test appointment book with multiple appointments.
    */
   @VisibleForTesting
-  String getValueForKey(String key) {
-//    return this.appointmentBooks.get(key);
-    throw new UnsupportedOperationException("I don't work yet anymore!");
+  void createTestAppointmentBookWithMultipleAppointments() {
+    String ownerName = "TestOwner";
+    AppointmentBook book = new AppointmentBook(ownerName);
+    book.addAppointment(new Appointment("Test appointment 1", "1/2/2016 1:00 PM", "1/2/2016 1:30 PM"));
+    book.addAppointment(new Appointment("Test appointment 2", "1/3/2016 8:30 AM", "1/3/2016 10:00 AM"));
+    book.addAppointment(new Appointment("Test appointment 3", "1/5/2016 8:30 AM", "1/6/2016 10:00 AM"));
+    this.appointmentBooks.put(ownerName, book);
   }
 }

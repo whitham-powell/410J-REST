@@ -83,6 +83,16 @@ public class PrettyPrinter implements AppointmentBookDumper {
   @Override
   public void dump(AbstractAppointmentBook book) throws IOException {
     SortedSet<Appointment> sortedBook = ((AppointmentBook) book).getSortedSet();
+    printAppointments(book, sortedBook);
+  }
+
+  public void dumpRange(AbstractAppointmentBook book, Date beginDateRange, Date endDateRange) {
+    SortedSet<Appointment> sortedBook = ((AppointmentBook) book).byRange(beginDateRange, endDateRange);
+    printAppointments(book, sortedBook);
+  }
+
+
+  private void printAppointments(AbstractAppointmentBook book, SortedSet<Appointment> sortedBook) {
     Iterator<Appointment> sortedAppointments = sortedBook.iterator();
 
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.LONG);
@@ -111,8 +121,6 @@ public class PrettyPrinter implements AppointmentBookDumper {
       pw.format("Until: %s %n", df.format(endTime));
       pw.format("Duration: %d hours, %d minutes %n", hours, minutes % 60);
     }
-
   }
-
 
 }

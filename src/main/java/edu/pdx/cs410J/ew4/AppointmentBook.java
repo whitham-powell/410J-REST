@@ -5,6 +5,7 @@ import edu.pdx.cs410J.AbstractAppointmentBook;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 
 /**
@@ -18,6 +19,8 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
 
   /**
    * Instantiates a new Appointment book.
+   *
+   * @param that the that
    */
   public AppointmentBook(AppointmentBook that) {
     this.ownerName = that.getOwnerName();
@@ -67,15 +70,12 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
    */
   @Override
   public Collection<AbstractAppointment> getAppointments() {
-//    if (appointments.isEmpty()) {
-//      return null;
-//    } else {
-      return this.appointments;
-//    }
+    return this.appointments;
   }
 
   /**
    * Adds an <code>AbstractAppointment</code> object to the collection of appointments.
+   *
    * @param appointment an <code>AbstractAppointment</code> object to be added to the collection.
    */
   @Override
@@ -100,5 +100,24 @@ public class AppointmentBook extends AbstractAppointmentBook<AbstractAppointment
     return appointments.size();
   }
 
+  /**
+   * By range appointment book.
+   *
+   * @param beginTimeRange the begin time range
+   * @param endTimeRange   the end time range
+   * @return the appointment book
+   */
+  public SortedSet<Appointment> byRange(Date beginTimeRange, Date endTimeRange) {
+
+    SortedSet<Appointment> s = new TreeSet<>(Appointment::compareTo);
+
+    s.addAll(getSortedSet()
+            .parallelStream()
+            .filter(app -> (app.getBeginTime().after(beginTimeRange) && app.getBeginTime().before(endTimeRange)
+                    || app.getBeginTime().equals(beginTimeRange)))
+            .collect(Collectors.toSet()));
+
+    return s;
+  }
 }
 
