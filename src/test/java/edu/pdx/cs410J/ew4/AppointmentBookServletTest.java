@@ -85,6 +85,12 @@ public class AppointmentBookServletTest {
 
   }
 
+  /**
+   * Default action if no parameters is print list of book keys.
+   *
+   * @throws IOException      the io exception
+   * @throws ServletException the servlet exception
+   */
   @Test
   public void defaultActionIfNoParametersIsPrintListOfBookKeys() throws IOException, ServletException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();
@@ -101,6 +107,12 @@ public class AppointmentBookServletTest {
     verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
+  /**
+   * Owner book not found prints list of owner keys.
+   *
+   * @throws IOException      the io exception
+   * @throws ServletException the servlet exception
+   */
   @Test
   public void ownerBookNotFoundPrintsListOfOwnerKeys() throws IOException, ServletException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();
@@ -124,6 +136,12 @@ public class AppointmentBookServletTest {
 
   }
 
+  /**
+   * Do post with owner not yet in database creates new book and adds appointment.
+   *
+   * @throws IOException      the io exception
+   * @throws ServletException the servlet exception
+   */
   @Test
   public void doPostWithOwnerNotYetInDatabaseCreatesNewBookAndAddsAppointment() throws IOException, ServletException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();
@@ -156,6 +174,12 @@ public class AppointmentBookServletTest {
     assertThat(appointment.getEndTimeString(), equalTo(endTime));
   }
 
+  /**
+   * Do get with begin and end time displays all appointments for owner during the supplied interval.
+   *
+   * @throws ServletException the servlet exception
+   * @throws IOException      the io exception
+   */
   @Test
   public void doGetWithBeginAndEndTimeDisplaysAllAppointmentsForOwnerDuringTheSuppliedInterval() throws ServletException, IOException {
     AppointmentBookServlet servlet = new AppointmentBookServlet();
@@ -197,22 +221,5 @@ public class AppointmentBookServletTest {
 
     verify(response).setStatus(HttpServletResponse.SC_OK);
   }
-
-  /*@Test
-  public void initiallyServletContainsNoKeyValueMappings() throws ServletException, IOException {
-    AppointmentBookServlet servlet = new AppointmentBookServlet();
-
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    HttpServletResponse response = mock(HttpServletResponse.class);
-    PrintWriter pw = mock(PrintWriter.class);
-
-    when(response.getWriter()).thenReturn(pw);
-
-    servlet.doGet(request, response);
-
-    int expectedMappings = 0;
-    verify(pw).println(Messages.getMappingCount(expectedMappings));
-    verify(response).setStatus(HttpServletResponse.SC_OK);
-  }*/
 
 }

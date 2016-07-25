@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
  * Appointment Book server using REST.
  */
 public class Project4 {
-
+  //TODO SEARCH FEATURE AND EVERYTHING ELSE ON COMMAND LINE
   public static final String MISSING_ARGS = "Missing command line arguments";
 
   public static void main(String... args) {

@@ -86,6 +86,13 @@ public class PrettyPrinter implements AppointmentBookDumper {
     printAppointments(book, sortedBook);
   }
 
+  /**
+   * Dump range.
+   *
+   * @param book           the book
+   * @param beginDateRange the begin date range
+   * @param endDateRange   the end date range
+   */
   public void dumpRange(AbstractAppointmentBook book, Date beginDateRange, Date endDateRange) {
     SortedSet<Appointment> sortedBook = ((AppointmentBook) book).byRange(beginDateRange, endDateRange);
     printAppointments(book, sortedBook);
