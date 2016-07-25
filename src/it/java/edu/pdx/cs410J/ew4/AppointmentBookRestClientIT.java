@@ -10,6 +10,7 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 /**
  * Integration test that tests the REST calls made by {@link AppointmentBookRestClient}
@@ -31,6 +32,7 @@ public class AppointmentBookRestClientIT {
     Response response = client.prettyPrintAppointmentBook(owner);
     assertThat(response.getContent(), response.getCode(), equalTo(200));
     assertThat(response.getContent(), containsString(owner));
+
   }
 
   @Test
@@ -41,7 +43,7 @@ public class AppointmentBookRestClientIT {
     String beginTime = "1/2/2016 1:00 PM";
     String endTime = "1/4/2016 2:00 PM";
 
-    Response response = client.createAppointment(owner, description, endTime, beginTime);
+    Response response = client.createAppointment(owner, description, beginTime, endTime);
     assertThat(response.getContent(), response.getCode(), equalTo(200));
 
     response = client.prettyPrintAppointmentBook(owner);
@@ -63,11 +65,11 @@ public class AppointmentBookRestClientIT {
 
     // app 1
     String description1 = "Second test description";
-    String beginTime1 = "1/4/2016 5:00 PM";
-    String endTime1 = "1/4/2016 4:00 PM";
+    String beginTime1 = "1/4/2016 4:00 PM";
+    String endTime1 = "1/4/2016 5:00 PM";
 
-    String prettyBeginTime1 = "Monday, January 4, 2016 5:00:00 PM PST";
-    String prettyEndTime1 = "Monday, January 4, 2016 4:00:00 PM PST";
+    String prettyBeginTime1 = "Monday, January 4, 2016 4:00:00 PM PST";
+    String prettyEndTime1 = "Monday, January 4, 2016 5:00:00 PM PST";
 
     Response response = client.createAppointment(owner, description1, beginTime1, endTime1);
     assertThat(response.getContent(), response.getCode(), equalTo(200));
@@ -82,11 +84,11 @@ public class AppointmentBookRestClientIT {
 
     // app 2
     String description2 = "Third test description";
-    String beginTime2 = "1/1/2016 4:00 AM";
-    String endTime2 = "1/1/2016 3:00 AM";
+    String beginTime2 = "1/1/2016 3:00 AM";
+    String endTime2 = "1/1/2016 4:00 AM";
 
-    String prettyBeginTime2 = "Monday, January 4, 2016 5:00:00 PM PST";
-    String prettyEndTime2 = "Monday, January 4, 2016 4:00:00 PM PST";
+    String prettyBeginTime2 = "Friday, January 1, 2016 3:00:00 AM PST";
+    String prettyEndTime2 = "Friday, January 1, 2016 4:00:00 AM PST";
 
     response = client.createAppointment(owner, description2, beginTime2, endTime2);
     assertThat(response.getContent(), response.getCode(), equalTo(200));
@@ -99,6 +101,42 @@ public class AppointmentBookRestClientIT {
     assertThat("failed at app 2", response.getContent(), containsString(prettyBeginTime2));
     assertThat("failed at app 2", response.getContent(), containsString(prettyEndTime2));
 
+
+  }
+
+  @Test
+  public void test3DoGetWithSearchOption() throws IOException {
+
+    AppointmentBookRestClient client = newAppointmentBookRestClient();
+    String owner = "TestOwner";
+
+    String description1 = "Test appointment 1";
+    String beginTimeString1 = "1/2/2016 1:00 PM";
+    String endTimeString1 = "1/2/2016 1:30 PM";
+
+    String description2 = "Test appointment 2";
+    String beginTimeString2 = "1/3/2016 8:30 AM";
+    String endTimeString2 = "1/3/2016 10:00 AM";
+
+    String description3 = "Test appointment 3";
+    String beginTimeString3 = "1/5/2016 8:30 AM";
+    String endTimeString3 = "1/6/2016 10:00 AM";
+
+    Response response = client.createAppointment(owner, description1, beginTimeString1, endTimeString1);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    response = client.createAppointment(owner, description2, beginTimeString2, endTimeString2);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    response = client.createAppointment(owner, description3, beginTimeString3, endTimeString3);
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    response = client.prettyPrintAppointmentBookByRange(owner, "1/2/2016 12:00 AM", "1/4/2016 12:00 PM");
+    assertThat(response.getContent(), response.getCode(), equalTo(200));
+
+    assertThat(response.getContent(), containsString(description2));
+
+    assertThat(response.getContent(), not(containsString(description3)));
 
   }
 

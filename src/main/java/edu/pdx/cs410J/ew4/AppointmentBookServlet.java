@@ -123,7 +123,7 @@ public class AppointmentBookServlet extends HttpServlet {
    */
   private void bookNotFoundForOwner(HttpServletResponse response, String owner) throws IOException {
     response.getWriter().println(Messages.noBookForOwner(owner));
-    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   /**
@@ -163,6 +163,7 @@ public class AppointmentBookServlet extends HttpServlet {
     String owner = getParameter("owner", request);
     AppointmentBook book = getAppointmentBook(owner);
 
+    //TODO Error checking
     String description = getParameter("description", request);
     String beginTime = getParameter("beginTime", request);
     String endTime = getParameter("endTime", request);

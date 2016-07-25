@@ -56,7 +56,11 @@ public class AppointmentBookRestClient extends HttpRequestHelper {
     return get(this.url, "owner", owner);
   }
 
-  public Response createAppointment(String owner, String description, String endTimeString, String beginTimeString) throws IOException {
+  public Response prettyPrintAppointmentBookByRange(String owner, String beginTime, String endTime) throws IOException {
+    return get(this.url, "owner", owner, "beginTime", beginTime, "endTime", endTime);
+  }
+
+  public Response createAppointment(String owner, String description, String beginTimeString, String endTimeString) throws IOException {
     return post(this.url, "owner", owner, "description", description, "beginTime", beginTimeString, "endTime", endTimeString);
   }
 
