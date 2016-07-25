@@ -10,7 +10,18 @@ and AppointmentBook classes to better work with the REST client and servlet. The
 Date objects in its constructor when building new Appointments. This is later used within the AppointmentBook class to
 get a Sorted set of Appointments within a Supplied as part of the GET functionality of the AppointmentServlet.
 
+    Since Appointments are sorted and managed with Date objects, there is no longer a need for a separate InfoValidator
+class. The DateFormat parsing can already handle any badly formatted Dates in a graceful way using exception handling
+and error messages via catching ParserExceptions. Within the Appointment class, there are several methods and constructors
+that no longer serve a purpose which also will be removed from this Projects version of the Appointment class. Along with
+this cleaning up of code, other helper classes, will be refactored. For example, my CommandLineParser needs a new approach
+because dealing with more than one option with an argument seems to have broken my current algorithm and thus a simpler
+approach to sorting and parsing the command line is needed.
+
     If an AppointmentBook is not found the servlet responds with a message indicating a book was not found for the
 owner supplied. It then prints a list of known/managed AppointmentBooks by owner. To protect against concurrency issues
 that could arise via a web server, I chose to store all of the AppointmentBooks in ConcurrentHashMap object from the
-Java Collections framework.
+Java Collections framework. A new method for the AppointmentBook creates a SortedSet of all of its Appointments that have
+a beginning time within a range supplied by argument. This method is then used in conjunction with a new PrettyPrinter
+dump method that pretty prints only Appointments within that range. This is utilized when the URL contains owner,
+beginTime, and endTime parameters. If only a beginTime or only an endTime are supplied it displays an error.
