@@ -56,16 +56,17 @@ public class AppointmentBookServlet extends HttpServlet {
 
     if (owner == null) {
       listAllBookOwners(response);
+      response.setStatus(HttpServletResponse.SC_OK);
       return;
     }
 
     boolean byRange = false;
+
     Date beginDateRange = null;
     Date endDateRange = null;
-
     if (beginTime != null && endTime != null) {
+      DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
       try {
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         beginDateRange = df.parse(beginTime);
         endDateRange = df.parse(endTime);
       } catch (ParseException e) {
@@ -90,6 +91,7 @@ public class AppointmentBookServlet extends HttpServlet {
     if (book == null) {
       bookNotFoundForOwner(response, owner);
       listAllBookOwners(response);
+      response.setStatus(HttpServletResponse.SC_OK);
       return;
     }
 
@@ -102,13 +104,26 @@ public class AppointmentBookServlet extends HttpServlet {
     }
   }
 
+  /**
+   * Pretty Print a range of appointments
+   *
+   * @param book           to print
+   * @param pw             where to print to
+   * @param beginDateRange starting after or on this date
+   * @param endDateRange   starting before this date
+   * @throws IOException something went wrong communicating with server.
+   */
   private void prettyPrintRange(AppointmentBook book, PrintWriter pw, Date beginDateRange, Date endDateRange) throws IOException {
     PrettyPrinter pp = new PrettyPrinter(pw);
     pp.dumpRange(book, beginDateRange, endDateRange);
     pw.flush();
   }
 
-  //TODO document invalidDateTime
+  /**
+   * @param response <code>HttpServletResponse</code>
+   * @param eMessage error Message
+   * @throws IOException problem communicating with server.
+   */
   private void invalidDateTime(HttpServletResponse response, String eMessage) throws IOException {
     String message = Messages.dateTimeFailedToParse(eMessage);
     response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, message);
@@ -123,7 +138,7 @@ public class AppointmentBookServlet extends HttpServlet {
    */
   private void bookNotFoundForOwner(HttpServletResponse response, String owner) throws IOException {
     response.getWriter().println(Messages.noBookForOwner(owner));
-    response.setStatus(HttpServletResponse.SC_OK);
+//    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   /**
@@ -163,12 +178,38 @@ public class AppointmentBookServlet extends HttpServlet {
     String owner = getParameter("owner", request);
     AppointmentBook book = getAppointmentBook(owner);
 
-    //TODO Error checking
     String description = getParameter("description", request);
-    String beginTime = getParameter("beginTime", request);
-    String endTime = getParameter("endTime", request);
+    String beginTimeString = getParameter("beginTime", request);
+    String endTimeString = getParameter("endTime", request);
 
-    Appointment toAdd = new Appointment(description, beginTime, endTime);
+    if (description == null) {
+      missingRequiredParameter(response, "description");
+      return;
+    }
+
+    if (beginTimeString == null) {
+      missingRequiredParameter(response, "beginTime");
+      return;
+    }
+
+    if (endTimeString == null) {
+      missingRequiredParameter(response, "endTime");
+      return;
+    }
+
+    Date beginTimeDate;
+    Date endTimeDate;
+
+    try {
+      DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+      beginTimeDate = df.parse(beginTimeString);
+      endTimeDate = df.parse(endTimeString);
+    } catch (ParseException e) {
+      invalidDateTime(response, e.getMessage());
+      return;
+    }
+
+    Appointment toAdd = new Appointment(description, beginTimeDate, endTimeDate);
 
     if (book == null) {
       book = new AppointmentBook(owner);
@@ -226,8 +267,7 @@ public class AppointmentBookServlet extends HttpServlet {
     }
 
     pw.flush();
-
-    response.setStatus(HttpServletResponse.SC_OK);
+//    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   /**

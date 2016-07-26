@@ -131,7 +131,7 @@ public class AppointmentBookServletTest {
     servlet.doGet(request, response);
 
     verify(pw).println(Messages.noBookForOwner(ownerName));
-    verify(response).setStatus((HttpServletResponse.SC_NOT_FOUND));
+    verify(response).setStatus((HttpServletResponse.SC_OK));
     verify(pw).println(Messages.formatOwnerListing(testOwner));
 
   }
