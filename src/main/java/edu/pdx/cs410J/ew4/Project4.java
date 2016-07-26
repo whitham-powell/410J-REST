@@ -56,6 +56,7 @@ public class Project4 {
     CommandLineParser.Commands commands = commandLine.parse(8);
 
     // Special search case
+    /* BEGIN SPECIAL CASE OF -search */
     if (commandLine.getToParse().contains("-search")) {
       commandLine = new CommandLineParser(options, args);
       commands = commandLine.parse(7);
@@ -104,6 +105,7 @@ public class Project4 {
       }
       System.exit(0);
     }
+    /* END SPECIAL CASE OF -search */
 
     // Check for README flag special case to exit
     if (commands.hasOption("README")) {

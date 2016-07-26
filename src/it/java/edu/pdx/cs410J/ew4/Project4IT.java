@@ -81,6 +81,8 @@ public class Project4IT extends InvokeMainTestCase {
     assertThat(result.getOut(), result.getOut(), containsString("Project4 - first appointment"));
     assertThat(result.getOut(), result.getOut(), containsString("Project4 - second appointment"));
     assertThat(result.getOut(), result.getOut(), not(containsString("Project4 - third appointment")));
+
+    System.out.print(result.getOut());
   }
 
   @Test
