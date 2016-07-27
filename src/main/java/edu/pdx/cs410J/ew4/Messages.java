@@ -12,7 +12,7 @@ public class Messages {
    * @return the mapping count
    */
   public static String getMappingCount(int count) {
-    return String.format("Server contains %d key/value pairs", count);
+    return String.format("Server contains %d Appointment Books", count);
   }
 
   /**

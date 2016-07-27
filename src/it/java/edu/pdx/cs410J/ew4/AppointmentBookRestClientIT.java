@@ -25,6 +25,11 @@ public class AppointmentBookRestClientIT {
     return new AppointmentBookRestClient(HOSTNAME, port);
   }
 
+  /**
+   * Test 0 invoking get with just owner name pretty printer owner parameter.
+   *
+   * @throws IOException the io exception
+   */
   @Test
   public void test0invokingGETWithJustOwnerNamePrettyPrinterOwnerParameter() throws IOException {
     AppointmentBookRestClient client = newAppointmentBookRestClient();
@@ -35,6 +40,11 @@ public class AppointmentBookRestClientIT {
 
   }
 
+  /**
+   * Test 1 invoking post creates an appointment book and appointment.
+   *
+   * @throws IOException the io exception
+   */
   @Test
   public void test1invokingPOSTCreatesAnAppointmentBookAndAppointment() throws IOException {
     AppointmentBookRestClient client = newAppointmentBookRestClient();
@@ -58,6 +68,11 @@ public class AppointmentBookRestClientIT {
     assertThat(response.getContent(), containsString(prettyEndTime));
   }
 
+  /**
+   * Test 2 two more appointments to the book.
+   *
+   * @throws IOException the io exception
+   */
   @Test
   public void test2TwoMoreAppointmentsToTheBook() throws IOException {
     AppointmentBookRestClient client = newAppointmentBookRestClient();
@@ -104,6 +119,11 @@ public class AppointmentBookRestClientIT {
 
   }
 
+  /**
+   * Test 3 do get with search option.
+   *
+   * @throws IOException the io exception
+   */
   @Test
   public void test3DoGetWithSearchOption() throws IOException {
 

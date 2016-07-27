@@ -116,7 +116,7 @@ public class PrettyPrinter implements AppointmentBookDumper {
       // Get appointment duration
       // If either Date is null duration is 0
       long hours = 0;
-      long minutes = 0 ;
+      long minutes = 0;
       if (beginTime != null && endTime != null) {
         hours = ChronoUnit.HOURS.between(beginTime.toInstant(), endTime.toInstant());
         minutes = ChronoUnit.MINUTES.between(beginTime.toInstant(), endTime.toInstant());

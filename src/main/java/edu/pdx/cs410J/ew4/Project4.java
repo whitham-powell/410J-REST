@@ -19,6 +19,9 @@ import static java.lang.System.out;
  * Appointment Book server using REST.
  */
 public class Project4 {
+  /**
+   * The constant MISSING_ARGS.
+   */
   public static final String MISSING_ARGS = "Missing command line arguments";
 
   private static final String USAGE =
@@ -40,6 +43,11 @@ public class Project4 {
                   "\t\t\t The appointment book can also be created from and saved to a text file provided\n" +
                   "\t\t\t via the options list.\n";
 
+  /**
+   * The entry point of application.
+   *
+   * @param args the input arguments
+   */
   public static void main(String... args) {
     String hostName;
     String portString;
